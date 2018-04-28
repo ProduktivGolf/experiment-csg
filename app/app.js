@@ -14,7 +14,7 @@ window.onload = function() {
 	// debug: create playfield
 	Minigolf.world.addBorder({x:50,y:50, width: 210, height:10});
 	Minigolf.world.addBorder({x:260,y:30, width: 10, height:150});
-	Minigolf.world.addPlayerBall({x:50,y:20});
+	Minigolf.world.addPlayerBall({x:50,y:150, radius:10});
 	//
 	
 	// game loop

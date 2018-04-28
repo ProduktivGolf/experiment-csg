@@ -7,8 +7,12 @@ export var Minigolf = (function(){
 	// world defintion with objects
 	let myWorld = {
 		staticObjects: [],
+		balls: [],
 		addBorder: function(data) {
 			this.staticObjects.push(data);
+		},
+		addPlayerBall: function(data) {
+			this.balls.push(data);			
 		}
 	};
 	// public functions and variables
@@ -18,7 +22,10 @@ export var Minigolf = (function(){
 			// update game with constant delta ...
 		},
 		render: function() {		
-			renderer.drawAll(this.world.staticObjects);	
+			renderer.beginFrame();
+			renderer.drawStatic(this.world.staticObjects);	
+			renderer.drawBalls(this.world.balls);
+			renderer.endFrame();			
 		}
 	}
 })();
