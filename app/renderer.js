@@ -6,6 +6,7 @@ export function CreateRenderer(setup) {
 	let canvas = document.createElement("canvas");
 	let ctx = canvas.getContext("2d");	
 	let mousePos = null;
+	let shootingVector = {x:0, y:0};
 	canvas.width = 500;					
 	canvas.height = 300;				
 	document.body.appendChild(canvas);	 
@@ -23,7 +24,12 @@ export function CreateRenderer(setup) {
 	}, true);		
 	canvas.addEventListener('mousemove', function(evt) {	
 		mousePos = getMousePos(canvas, evt);
-	}, false);	
+		shootingVector = {x:mousePos.x - playerBall.x,y:mousePos.y - playerBall.y};
+	}, false);		
+	canvas.addEventListener('click', function(evt) { 
+		if (setup.inputCallback)
+			setup.inputCallback({type:1, data:shootingVector});
+	});
 
 	
 	// variables
