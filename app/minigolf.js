@@ -1,5 +1,10 @@
 import * as Rendering from './renderer.js';
 
+//// Modules ////
+import * as module_wall from './module_wall.js';
+import * as module_stickywall from './module_stickywall.js';
+/////////////////
+
 var velocityScale = 0.00005;
 
 export var Minigolf = (function(){
@@ -16,6 +21,19 @@ export var Minigolf = (function(){
 					});
 			}
 	}
+	
+	let modules = {};
+	
+	// function for registering new functionality
+	let registerGameModule = function(moduleSetup) {
+		console.log("activating module '" + moduleSetup.moduleName + "'");		  
+		// check for dependencies first
+		if (!Array.isArray(moduleSetup.dependencies) || !moduleSetup.dependencies.length) {
+			/// ...
+		}		
+		// all types of checks: module already used?	
+		modules[moduleSetup.moduleName] = moduleSetup.create(myWorld, engine);	
+	}
 
 	let visualSetup = {
 		inputCallback: handleUserInput
@@ -28,11 +46,16 @@ export var Minigolf = (function(){
 	engine.world.gravity.y = 0;
 	
 	let playerBall = null;
+	
 
-	// world defintion with objects
+	// world defintion with objects, should get its own file
 	let myWorld = {
 		staticObjects: [],
 		balls: [],
+		addStaticObject: function(object) {
+			this.staticObjects.push(object);	
+			Matter.World.add(engine.world, [object.physicObject]);			
+		},
 		addBorder: function(data) {
 			this.staticObjects.push(data);
 			// register in physics engine
@@ -41,8 +64,7 @@ export var Minigolf = (function(){
 				friction:0,
 				restitution:0
 			});
-			Matter.World.add(engine.world, [box]);
-			data.physicObject = box;
+			data.physicObject = box;			
 		},
 		addPlayerBall: function(data) {
 			this.balls.push(data);		
@@ -53,9 +75,27 @@ export var Minigolf = (function(){
 			sphere.frictionAir = 0.02;
 			sphere.friction = 0;
 			sphere.restitution = 1;
+			sphere.label = "ball";
 			playerBall = data; // hacky for now!
 		}
 	};
+	
+	// register all modules	
+	registerGameModule(module_wall);
+	registerGameModule(module_stickywall);	
+	
+	// debug: create playfield
+	modules["stickywall"].addBorder({x:50,y:50, width: 210, height:10});
+	modules["stickywall"].addBorder({x:260,y:30, width: 10, height:150});
+	
+	modules["wall"].addBorder({x:0,y:0, width: 500, height:10});	
+	modules["wall"].addBorder({x:0,y:290, width: 500, height:10});		
+	modules["wall"].addBorder({x:0,y:0, width: 10, height:300});
+	modules["wall"].addBorder({x:490,y:0, width: 10, height:300});
+
+	myWorld.addPlayerBall({x:50,y:150, radius:10});	
+	//	
+
 	// public functions and variables
 	return {
 		world:myWorld,
